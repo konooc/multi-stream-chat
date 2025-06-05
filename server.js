@@ -629,6 +629,22 @@ app.get('/twitchimage/:twitchUser', async (req, res) => {
         res.redirect(userInfo.profilePictureUrl);
     }
 });
+
+app.get('/admin.html', (req, res, next) => {
+  const auth = req.headers.authorization || '';
+  const [user, pass] = Buffer.from(auth.replace('Basic ', ''), 'base64').toString().split(':');
+
+  const validUser = 'admin';
+  const validPass = '12282527jr';
+
+  if (user === validUser && pass === validPass) {
+    return next(); // permitir el acceso al archivo
+  }
+
+  res.setHeader('WWW-Authenticate', 'Basic realm="Admin Area"');
+  res.status(401).send('Acceso denegado');
+});
+
 app.use(express.static('pub'));
 
 const port = process.env.PORT || 8082;
